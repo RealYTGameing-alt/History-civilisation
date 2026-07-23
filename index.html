@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Cradles of Civilization — Egypt · Mesopotamia · China</title>
+<meta name="description" content="An exhibition of three ancient civilizations: Egypt, Mesopotamia, and China.">
+
+<!-- Preconnect for faster font loading -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Progress spine: runs the full height of the document, marks the three eras -->
+<div class="spine" aria-hidden="true">
+  <div class="spine-track"></div>
+  <div class="spine-fill" id="spineFill"></div>
+</div>
+
+<!-- Wayfinding dots -->
+<nav class="wayfinder" aria-label="Section navigation">
+  <a href="#hero" class="way-dot" data-target="hero"><span>Entrance</span></a>
+  <a href="#egypt" class="way-dot" data-target="egypt"><span>Egypt</span></a>
+  <a href="#mesopotamia" class="way-dot" data-target="mesopotamia"><span>Mesopotamia</span></a>
+  <a href="#china" class="way-dot" data-target="china"><span>China</span></a>
+  <a href="#compare" class="way-dot" data-target="compare"><span>Compare</span></a>
+</nav>
+
+<!-- Mobile top bar -->
+<header class="topbar">
+  <span class="topbar-mark">C.O.C.</span>
+  <button class="topbar-toggle" id="menuToggle" aria-label="Open section menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#hero" data-target="hero">Entrance</a>
+  <a href="#egypt" data-target="egypt">I. Egypt</a>
+  <a href="#mesopotamia" data-target="mesopotamia">II. Mesopotamia</a>
+  <a href="#china" data-target="china">III. China</a>
+  <a href="#compare" data-target="compare">Compare the Three</a>
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <img src="assets/images/egypt-hero.jpg" alt="" loading="eager" fetchpriority="high">
+    <div class="hero-scrim"></div>
+  </div>
+  <div class="hero-content">
+    <p class="eyebrow">A permanent exhibition &nbsp;·&nbsp; est. 3100 BCE — 1912 CE</p>
+    <h1 class="hero-title">Cradles of<br>Civilization</h1>
+    <p class="hero-sub">Three rivers. Three empires. Three ways humanity first learned to build,
+      write, worship, and rule. Walk the Nile, the Tigris &amp; Euphrates, and the Yellow River —
+      the water that wrote history.</p>
+    <a href="#egypt" class="hero-cta">
+      <span>Begin the walkthrough</span>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v13M2 8l6 6 6-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+  <div class="hero-scroll-cue" aria-hidden="true">
+    <span>Scroll</span>
+    <div class="cue-line"></div>
+  </div>
+</section>
+
+<!-- ============ EGYPT ============ -->
+<section class="civ" id="egypt" data-civ="egypt" style="--civ-a:#c9a227; --civ-b:#1f4e5f; --civ-glow: 201,162,39;">
+
+  <div class="civ-hero">
+    <img src="assets/images/egypt-hero.jpg" alt="Golden hour view of the pyramids and temple complex of Giza" loading="lazy">
+    <div class="civ-hero-scrim"></div>
+    <div class="civ-hero-text fade-up">
+      <span class="civ-number">I</span>
+      <h2>Ancient Egypt</h2>
+      <p class="civ-tagline">Gift of the Nile</p>
+    </div>
+  </div>
+
+  <div class="civ-body">
+    <div class="civ-meta fade-up">
+      <div class="meta-block">
+        <span class="meta-label">Where</span>
+        <span class="meta-value">Along the Nile River, northeast Africa</span>
+      </div>
+      <div class="meta-block">
+        <span class="meta-label">When</span>
+        <span class="meta-value">c. 3100 BCE – 30 BCE</span>
+      </div>
+      <div class="meta-block">
+        <span class="meta-label">Known for</span>
+        <span class="meta-value">Pyramids, pharaohs, hieroglyphs, mummification</span>
+      </div>
+    </div>
+
+    <div class="civ-grid">
+      <div class="civ-text fade-up">
+        <h3>Why the river came first</h3>
+        <p>Every summer the Nile flooded its banks and left behind a strip of black,
+          fertile silt. That single, predictable event made Egypt possible: farmers could
+          grow surplus grain in a strip of desert, surplus grain fed cities, and cities fed
+          the idea of a single ruler who controlled the water's gift. The Egyptians called
+          their own land <em>Kemet</em>, "the Black Land," named for that soil — and the
+          surrounding desert <em>Deshret</em>, "the Red Land."</p>
+        <p>Around 3100 BCE, King Narmer united the farming villages of Upper and Lower
+          Egypt into one kingdom, wearing the White and Red crowns together for the first
+          time. What followed was one of the longest continuous civilizations in
+          history — over three thousand years under more than 170 pharaohs, from the first
+          pyramids at Saqqara to Cleopatra VII, the last of the Ptolemies.</p>
+      </div>
+      <figure class="civ-image fade-up">
+        <img src="assets/images/egypt-map.jpg" alt="Map of Ancient Egypt showing the Nile River, Memphis, Heliopolis, Abydos, Hierakonpolis and Elephantine">
+        <figcaption>The Nile Valley — Egypt's cities strung like beads along its one river</figcaption>
+      </figure>
+    </div>
+
+    <div class="civ-grid reverse">
+      <figure class="civ-image fade-up">
+        <img src="assets/images/egypt-tomb.jpg" alt="Tomb wall painting showing offering bearers presenting food to a seated figure">
+        <figcaption>Tomb painting, Thebes — offerings of bread, produce and meat for the afterlife</figcaption>
+      </figure>
+      <div class="civ-text fade-up">
+        <h3>Writing for the gods, and for eternity</h3>
+        <p>The Egyptians developed <strong>hieroglyphs</strong> — picture-signs that could
+          spell sounds, words, or ideas — as early as 3200 BCE, one of the first writing
+          systems on Earth. Priests used it to record religious ritual and the deeds of
+          kings; scribes used a faster cursive form, hieratic, for everyday business and
+          letters. Almost everything the Egyptians built was aimed at the same target:
+          surviving death. Tomb walls were painted with food, servants, and possessions so
+          the dead would want for nothing in the next life, and the body itself was
+          preserved through mummification so the soul, or <em>ka</em>, would recognize its
+          own form and return to it.</p>
+      </div>
+    </div>
+
+    <div class="civ-grid">
+      <div class="civ-text fade-up">
+        <h3>Monuments that still argue with time</h3>
+        <p>The Great Pyramid of Giza, built for the pharaoh Khufu around 2560 BCE, was the
+          tallest human-made structure on Earth for almost 3,800 years. It was raised
+          without iron tools, wheels, or writing systems as advanced as we now take for
+          granted — using ramps, sledges, copper chisels, and a labor force of skilled,
+          paid workers, not the slave armies of popular myth. Pharaohs were considered
+          living gods, intermediaries between the people of Egypt and deities like Ra,
+          Osiris, and Isis, and their tombs were built to match that status.</p>
+      </div>
+      <figure class="civ-image fade-up">
+        <img src="assets/images/egypt-pharaoh.jpg" alt="Statue of an Egyptian pharaoh wearing the nemes headdress with royal cobra and vulture insignia">
+        <figcaption>A pharaoh in the nemes headdress — cobra and vulture, guardians of Upper and Lower Egypt</figcaption>
+      </figure>
+    </div>
+
+    <ul class="fact-strip fade-up">
+      <li><span class="fact-num">3</span><span class="fact-label">United kingdoms<br>(Old, Middle, New)</span></li>
+      <li><span class="fact-num">170+</span><span class="fact-label">Pharaohs across<br>three millennia</span></li>
+      <li><span class="fact-num">24</span><span class="fact-label">Hieroglyphic<br>consonant signs</span></li>
+      <li><span class="fact-num">2560</span><span class="fact-label">BCE — Great Pyramid<br>of Giza completed</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ MESOPOTAMIA ============ -->
+<section class="civ" id="mesopotamia" data-civ="meso" style="--civ-a:#b4552f; --civ-b:#2f6b57; --civ-glow: 180,85,47;">
+
+  <div class="civ-hero">
+    <img src="assets/images/meso-hero.jpg" alt="Reconstruction of the ancient city of Babylon with its ziggurat and river" loading="lazy">
+    <div class="civ-hero-scrim"></div>
+    <div class="civ-hero-text fade-up">
+      <span class="civ-number">II</span>
+      <h2>Mesopotamia</h2>
+      <p class="civ-tagline">Land Between the Rivers</p>
+    </div>
+  </div>
+
+  <div class="civ-body">
+    <div class="civ-meta fade-up">
+      <div class="meta-block">
+        <span class="meta-label">Where</span>
+        <span class="meta-value">Between the Tigris &amp; Euphrates, modern Iraq</span>
+      </div>
+      <div class="meta-block">
+        <span class="meta-label">When</span>
+        <span class="meta-value">c. 3500 BCE – 539 BCE</span>
+      </div>
+      <div class="meta-block">
+        <span class="meta-label">Known for</span>
+        <span class="meta-value">Cuneiform, the wheel, ziggurats, the first cities</span>
+      </div>
+    </div>
+
+    <div class="civ-grid">
+      <div class="civ-text fade-up">
+        <h3>The world's first cities</h3>
+        <p>Mesopotamia — Greek for "between the rivers" — was fed by the Tigris and
+          Euphrates, but unlike the gentle, predictable Nile, these rivers flooded
+          violently and unpredictably. Taming them demanded irrigation canals, which
+          demanded organized labor, which demanded government. Out of that need grew the
+          Sumerians' city-states around 3500 BCE: Uruk, Ur, Eridu, and Lagash — the first
+          true cities in human history, each with its own king, temple, and army.</p>
+        <p>Sumer was later folded into a succession of empires that ruled the same land —
+          Akkadian, Babylonian, and Assyrian — each borrowing and rebuilding on what came
+          before. This is why Mesopotamia is often called the <strong>cradle of
+          civilization</strong>: nearly every "first" in urban life happened here first.</p>
+      </div>
+      <figure class="civ-image fade-up">
+        <img src="assets/images/meso-ziggurat.jpg" alt="The Great Ziggurat of Ur, a stepped mudbrick temple platform">
+        <figcaption>The Great Ziggurat of Ur, built c. 2100 BCE to honor the moon god Nanna</figcaption>
+      </figure>
+    </div>
+
+    <div class="civ-grid reverse">
+      <figure class="civ-image fade-up">
+        <img src="assets/images/meso-tablet.jpg" alt="Clay tablet inscribed with wedge-shaped cuneiform writing">
+        <figcaption>A cuneiform tablet — wedge-shaped marks pressed into wet clay with a reed stylus</figcaption>
+      </figure>
+      <div class="civ-text fade-up">
+        <h3>Marks that became words</h3>
+        <p>Around 3200 BCE, Sumerian accountants pressed reed styluses into wet clay to
+          track grain, livestock, and taxes — and in doing so invented
+          <strong>cuneiform</strong>, the first writing system anyone has found. It began
+          as pictures and evolved into hundreds of wedge-shaped signs standing for sounds
+          and syllables. Clay tablets baked in the sun or in kilns survive by the
+          hundreds of thousands, recording everything from royal proclamations to a
+          student's homework and a shopkeeper's complaint about bad-quality copper.</p>
+        <p>The Babylonians used the same base-60 number system we still use for minutes,
+          hours, and the 360 degrees of a circle, and their astronomers charted planetary
+          motion centuries before the Greeks. Hammurabi's Code, carved into a stone stele
+          around 1754 BCE, is one of the earliest surviving law codes: 282 rulings on
+          everything from wages to the responsibilities of a doctor.</p>
+      </div>
+    </div>
+
+    <div class="civ-grid">
+      <div class="civ-text fade-up">
+        <h3>Kings who ruled by divine right</h3>
+        <p>Mesopotamian kings claimed authority granted directly by the gods, and stone
+          reliefs across the region show rulers in audience, receiving offerings, or
+          commanding armies — carved records meant to project power for as long as the
+          stone survived. The Assyrian Empire, the region's most militarily dominant
+          phase, stretched from the Persian Gulf to Egypt at its height around 670 BCE,
+          administered through provinces, relay messengers, and one of the first
+          professional standing armies in history.</p>
+      </div>
+      <figure class="civ-image fade-up">
+        <img src="assets/images/meso-relief.jpg" alt="Stone relief carving showing an Assyrian king seated on a throne receiving an attendant">
+        <figcaption>Assyrian palace relief — a king enthroned, attended by a court official</figcaption>
+      </figure>
+    </div>
+
+    <ul class="fact-strip fade-up">
+      <li><span class="fact-num">5</span><span class="fact-label">Major empires<br>(Sumer to Assyria)</span></li>
+      <li><span class="fact-num">282</span><span class="fact-label">Laws in<br>Hammurabi's Code</span></li>
+      <li><span class="fact-num">60</span><span class="fact-label">Base number system —<br>still in our clocks</span></li>
+      <li><span class="fact-num">3200</span><span class="fact-label">BCE — earliest<br>cuneiform tablets</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ CHINA ============ -->
+<section class="civ" id="china" data-civ="china" style="--civ-a:#a3222b; --civ-b:#1f6b52; --civ-glow: 163,34,43;">
+
+  <div class="civ-hero">
+    <img src="assets/images/china-hero.jpg" alt="The Great Wall of China winding across green mountain ridges at sunrise" loading="lazy">
+    <div class="civ-hero-scrim"></div>
+    <div class="civ-hero-text fade-up">
+      <span class="civ-number">III</span>
+      <h2>Ancient China</h2>
+      <p class="civ-tagline">The Mandate of Heaven</p>
+    </div>
+  </div>
+
+  <div class="civ-body">
+    <div class="civ-meta fade-up">
+      <div class="meta-block">
+        <span class="meta-label">Where</span>
+        <span class="meta-value">The Yellow &amp; Yangtze River valleys, East Asia</span>
+      </div>
+      <div class="meta-block">
+        <span class="meta-label">When</span>
+        <span class="meta-value">c. 2070 BCE – 220 CE (and beyond)</span>
+      </div>
+      <div class="meta-block">
+        <span class="meta-label">Known for</span>
+        <span class="meta-value">The Great Wall, silk, paper, gunpowder, dynasties</span>
+      </div>
+    </div>
+
+    <div class="civ-grid">
+      <div class="civ-text fade-up">
+        <h3>A civilization ruled by dynasties</h3>
+        <p>Chinese civilization grew up along the Yellow River, whose fine, fertile silt
+          — and famously destructive floods — earned it the nickname "China's Sorrow."
+          Tradition holds that the Xia Dynasty rose here around 2070 BCE, followed by the
+          Shang, who left behind the first confirmed Chinese writing: questions scratched
+          onto ox bones and turtle shells and read by cracking them over fire, a practice
+          called oracle bone divination.</p>
+        <p>Unlike Egypt or Mesopotamia, ancient China's story continued almost
+          unbroken for thousands of years, passed from dynasty to dynasty under a single
+          idea: the <strong>Mandate of Heaven</strong> — the belief that a just ruler
+          governed with heaven's blessing, and a corrupt one could rightfully be
+          overthrown. It explained, and justified, every change of dynasty that followed.</p>
+      </div>
+      <figure class="civ-image fade-up">
+        <img src="assets/images/china-wall.jpg" alt="A restored section of the Great Wall of China running along a forested ridge">
+        <figcaption>The Great Wall near Mutianyu — built and rebuilt across two thousand years</figcaption>
+      </figure>
+    </div>
+
+    <div class="civ-grid reverse">
+      <figure class="civ-image fade-up">
+        <img src="assets/images/china-temple.jpg" alt="A golden-roofed temple perched on a steep mountain peak above the clouds">
+        <figcaption>A mountaintop temple — Chinese belief wove Confucian order, Daoist nature, and Buddhist faith together</figcaption>
+      </figure>
+      <div class="civ-text fade-up">
+        <h3>One wall, one empire, one script</h3>
+        <p>In 221 BCE, Qin Shi Huang conquered the last rival kingdoms and declared
+          himself the First Emperor, unifying China's writing script, currency, weights,
+          and even the axle width of carts. He connected and extended older border walls
+          into what became the Great Wall, a defense line eventually stretching more
+          than 13,000 miles under later dynasties, and was buried with an army of over
+          8,000 life-sized terracotta soldiers to guard him in the afterlife.</p>
+        <p>The Han Dynasty that followed opened the Silk Road, trading silk, tea, and
+          porcelain as far as Rome, while Chinese scholars and craftspeople developed
+          paper, the compass, and — centuries later — gunpowder and woodblock
+          printing: four inventions still called China's "Great Inventions."</p>
+      </div>
+    </div>
+
+    <div class="civ-grid">
+      <div class="civ-text fade-up">
+        <h3>Order, harmony, and the examined life</h3>
+        <p>Philosophy shaped Chinese civilization as much as any emperor. Confucius
+          (551–479 BCE) taught that social harmony came from respect between ruler and
+          subject, parent and child, husband and wife — a code of conduct that guided
+          Chinese government and family life for two thousand years. Daoism, by contrast,
+          urged living in balance with nature's flow. Grand palaces like the Forbidden
+          City, built centuries later, still reflect Confucian ideas of hierarchy and
+          cosmic order in their very floor plan — the emperor's throne aligned to the
+          exact center of the city, and the city, in theory, to the center of the world.</p>
+      </div>
+      <figure class="civ-image fade-up">
+        <img src="assets/images/china-forbidden.jpg" alt="A bronze guardian lion statue in front of the ornate red and gold buildings of the Forbidden City">
+        <figcaption>A bronze guardian lion at the Forbidden City, Beijing</figcaption>
+      </figure>
+    </div>
+
+    <ul class="fact-strip fade-up">
+      <li><span class="fact-num">13,000+</span><span class="fact-label">Miles of the<br>Great Wall</span></li>
+      <li><span class="fact-num">8,000</span><span class="fact-label">Terracotta soldiers<br>guarding Qin Shi Huang</span></li>
+      <li><span class="fact-num">4</span><span class="fact-label">Great Inventions —<br>paper, compass, gunpowder, printing</span></li>
+      <li><span class="fact-num">221</span><span class="fact-label">BCE — China<br>first unified</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ COMPARE ============ -->
+<section class="compare" id="compare">
+  <div class="compare-inner">
+    <p class="eyebrow fade-up">Before you go</p>
+    <h2 class="fade-up">Three rivers, one pattern</h2>
+    <p class="compare-lede fade-up">Egypt, Mesopotamia, and China never met, yet each one
+      followed the same river-born logic: fertile floodwater built farming surplus, surplus
+      built cities, cities needed record-keeping and law, and record-keeping demanded
+      writing. Civilization, it turns out, is what a great river leaves behind.</p>
+
+    <div class="compare-table-wrap fade-up">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Compare</th>
+            <th class="c-egypt">Egypt</th>
+            <th class="c-meso">Mesopotamia</th>
+            <th class="c-china">China</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Lifeline river</td>
+            <td>Nile</td>
+            <td>Tigris &amp; Euphrates</td>
+            <td>Yellow &amp; Yangtze</td>
+          </tr>
+          <tr>
+            <td>Writing system</td>
+            <td>Hieroglyphs</td>
+            <td>Cuneiform</td>
+            <td>Oracle bone script</td>
+          </tr>
+          <tr>
+            <td>Political form</td>
+            <td>Unified kingdom, one pharaoh</td>
+            <td>Rival city-states &amp; empires</td>
+            <td>Dynasties, one Mandate of Heaven</td>
+          </tr>
+          <tr>
+            <td>Signature structure</td>
+            <td>Pyramids of Giza</td>
+            <td>Ziggurats</td>
+            <td>The Great Wall</td>
+          </tr>
+          <tr>
+            <td>Lasting legacy</td>
+            <td>Monumental architecture, calendar</td>
+            <td>Law codes, the wheel, base-60 math</td>
+            <td>Paper, the compass, gunpowder, printing</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <p>Cradles of Civilization — an exhibition on Ancient Egypt, Mesopotamia &amp; China.</p>
+  <button id="backToTop" class="back-to-top" aria-label="Back to top">↑ Top</button>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>

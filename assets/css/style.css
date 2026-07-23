@@ -1,0 +1,391 @@
+/* ==========================================================================
+   CRADLES OF CIVILIZATION — stylesheet
+   Structure: 1. Reset & tokens  2. Base type  3. Fade-in animation system
+   4. Wayfinder / spine nav  5. Hero  6. Civilization sections
+   7. Compare table  8. Footer  9. Responsive breakpoints
+   ========================================================================== */
+
+/* ---------- 1. Reset & design tokens ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+:root{
+  /* base palette — dim, museum-gallery ink so lit artifacts read as the focus */
+  --ink:        #0e0d0b;
+  --ink-panel:  #171410;
+  --ink-raise:  #201c16;
+  --line:       rgba(236, 228, 211, 0.10);
+  --parchment:  #ece4d3;
+  --muted:      #a89a80;
+  --gold:       #c9a227;
+
+  /* type scale — fluid via clamp() so it holds up on phones through TVs */
+  --fs-eyebrow: clamp(0.7rem, 0.55rem + 0.4vw, 0.85rem);
+  --fs-body:    clamp(1rem, 0.93rem + 0.25vw, 1.15rem);
+  --fs-lede:    clamp(1.15rem, 1.02rem + 0.5vw, 1.45rem);
+  --fs-h2:      clamp(2.2rem, 1.6rem + 2.6vw, 4.4rem);
+  --fs-h3:      clamp(1.4rem, 1.2rem + 1vw, 2rem);
+  --fs-hero:    clamp(2.6rem, 1.6rem + 5vw, 6.5rem);
+  --fs-fact:    clamp(1.9rem, 1.4rem + 2vw, 3.2rem);
+
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --radius: 2px;
+}
+
+html, body { height: 100%; }
+body{
+  margin: 0;
+  background: var(--ink);
+  color: var(--parchment);
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+h1, h2, h3 {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-weight: 600;
+  margin: 0 0 0.5em;
+  letter-spacing: 0.01em;
+}
+p { margin: 0 0 1.1em; }
+p:last-child { margin-bottom: 0; }
+em { color: var(--civ-a, var(--gold)); font-style: italic; }
+strong { color: var(--parchment); font-weight: 600; }
+
+.eyebrow{
+  font-family: "Space Mono", monospace;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--civ-a, var(--gold));
+  display: block;
+  margin-bottom: 1rem;
+}
+
+/* ---------- 3. Fade-in animation system ---------- */
+.fade-up{
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s cubic-bezier(.22,.61,.36,1), transform 0.9s cubic-bezier(.22,.61,.36,1);
+  will-change: opacity, transform;
+}
+.fade-up.is-visible{ opacity: 1; transform: translateY(0); }
+
+/* stagger children of fact-strip and civ-meta slightly */
+.civ-meta.is-visible .meta-block,
+.fact-strip.is-visible li{ opacity: 1; transform: translateY(0); }
+.civ-meta .meta-block, .fact-strip li{
+  opacity: 0; transform: translateY(16px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.civ-meta .meta-block:nth-child(1), .fact-strip li:nth-child(1){ transition-delay: .05s; }
+.civ-meta .meta-block:nth-child(2), .fact-strip li:nth-child(2){ transition-delay: .15s; }
+.civ-meta .meta-block:nth-child(3), .fact-strip li:nth-child(3){ transition-delay: .25s; }
+.fact-strip li:nth-child(4){ transition-delay: .35s; }
+
+@media (prefers-reduced-motion: reduce){
+  .fade-up, .civ-meta .meta-block, .fact-strip li{
+    transition: none !important; opacity: 1 !important; transform: none !important;
+  }
+}
+
+/* ancient-artifact image treatment: warm duotone that lifts to full color on hover/focus */
+.civ-image img, .hero-bg img, .civ-hero img{
+  filter: sepia(0.34) saturate(1.18) contrast(1.04) brightness(0.94);
+  transition: filter 0.6s ease, transform 8s linear;
+}
+.civ-image:hover img{ filter: sepia(0.08) saturate(1.08) contrast(1.03) brightness(1); }
+
+/* ---------- 4. Wayfinder + progress spine ---------- */
+.spine{
+  position: fixed; top: 0; left: 0; width: 3px; height: 100%;
+  background: transparent; z-index: 60; pointer-events: none;
+}
+.spine-track{ position:absolute; inset:0; background: var(--line); }
+.spine-fill{
+  position:absolute; top:0; left:0; width:100%; height:0%;
+  background: linear-gradient(180deg, var(--gold), rgba(201,162,39,0.3));
+  transition: height .1s linear;
+}
+
+.wayfinder{
+  position: fixed; right: clamp(0.75rem, 2vw, 2rem); top: 50%; transform: translateY(-50%);
+  z-index: 50; display: flex; flex-direction: column; gap: 1.1rem; align-items: flex-end;
+}
+.way-dot{
+  position: relative; width: 10px; height: 10px; border-radius: 50%;
+  border: 1px solid var(--muted); background: transparent;
+  text-decoration: none; transition: background .3s, border-color .3s, transform .3s;
+  flex-shrink: 0;
+}
+.way-dot span{
+  position: absolute; right: 22px; top: 50%; transform: translateY(-50%);
+  font-family: "Space Mono", monospace; font-size: 0.68rem; letter-spacing: 0.08em;
+  text-transform: uppercase; white-space: nowrap; color: var(--muted);
+  opacity: 0; transition: opacity .25s ease; pointer-events: none;
+}
+.way-dot:hover span, .way-dot:focus-visible span{ opacity: 1; }
+.way-dot.active{ background: var(--gold); border-color: var(--gold); transform: scale(1.35); }
+.way-dot.active span{ color: var(--parchment); }
+
+/* mobile top bar (hidden on larger screens) */
+.topbar{
+  display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 70;
+  align-items: center; justify-content: space-between;
+  padding: 0.9rem var(--gutter);
+  background: linear-gradient(180deg, rgba(14,13,11,0.92), rgba(14,13,11,0));
+}
+.topbar-mark{
+  font-family: "Space Mono", monospace; letter-spacing: 0.15em; font-size: 0.85rem; color: var(--gold);
+}
+.topbar-toggle{
+  width: 34px; height: 26px; background: none; border: none; cursor: pointer;
+  display: flex; flex-direction: column; justify-content: space-between; padding: 4px 0;
+}
+.topbar-toggle span{ display:block; height: 2px; background: var(--parchment); border-radius: 2px; }
+.mobile-menu{
+  display: none; position: fixed; inset: 0; z-index: 65;
+  background: var(--ink-panel);
+  flex-direction: column; align-items: center; justify-content: center; gap: 1.6rem;
+  transform: translateY(-8px); opacity: 0; pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease;
+}
+.mobile-menu.open{ opacity: 1; transform: translateY(0); pointer-events: auto; }
+.mobile-menu a{
+  font-family: "Cormorant Garamond", serif; font-size: 1.8rem; text-decoration: none; color: var(--parchment);
+}
+
+/* ---------- 5. Hero ---------- */
+.hero{
+  position: relative; min-height: 100svh; display: flex; align-items: flex-end;
+  overflow: hidden;
+}
+.hero-bg{ position: absolute; inset: 0; }
+.hero-bg img{
+  width: 100%; height: 100%; object-fit: cover; object-position: center 62%;
+  transform: scale(1.08);
+}
+.hero-scrim{
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(14,13,11,0.55) 0%, rgba(14,13,11,0.35) 40%, rgba(14,13,11,0.92) 96%),
+    linear-gradient(90deg, rgba(14,13,11,0.55), rgba(14,13,11,0.15) 45%, rgba(14,13,11,0.55));
+}
+.hero-content{
+  position: relative; z-index: 2;
+  padding: 0 var(--gutter) clamp(4rem, 10vh, 7rem);
+  max-width: 68rem;
+}
+.hero-title{
+  font-size: var(--fs-hero); line-height: 0.95; margin: 0 0 1.1rem;
+  color: var(--parchment);
+  text-shadow: 0 2px 40px rgba(0,0,0,0.5);
+}
+.hero-sub{
+  font-size: var(--fs-lede); max-width: 42rem; color: var(--parchment); opacity: 0.92;
+  margin-bottom: 2.2rem; line-height: 1.55;
+}
+.hero-cta{
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  font-family: "Space Mono", monospace; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink); background: var(--gold); text-decoration: none;
+  padding: 0.95rem 1.6rem; border-radius: var(--radius);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.hero-cta:hover{ transform: translateY(-2px); box-shadow: 0 10px 30px rgba(201,162,39,0.35); }
+.hero-cta svg{ transition: transform .3s ease; }
+.hero-cta:hover svg{ transform: translateY(2px); }
+
+.hero-scroll-cue{
+  position: absolute; bottom: 1.6rem; left: var(--gutter); z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+}
+.hero-scroll-cue span{
+  font-family: "Space Mono", monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+}
+.cue-line{ width: 1px; height: 34px; background: var(--muted); overflow: hidden; position: relative; }
+.cue-line::after{
+  content: ""; position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
+  background: var(--gold); animation: cueDrop 1.8s ease-in-out infinite;
+}
+@keyframes cueDrop{ 0%{ top: -100%; } 60%{ top: 100%; } 100%{ top: 100%; } }
+@media (prefers-reduced-motion: reduce){ .cue-line::after{ animation: none; top: 30%; } }
+
+/* ---------- 6. Civilization sections ---------- */
+.civ{ position: relative; background: var(--ink); }
+
+.civ-hero{ position: relative; height: 78svh; min-height: 420px; overflow: hidden; }
+.civ-hero img{ width: 100%; height: 100%; object-fit: cover; }
+.civ-hero-scrim{
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(14,13,11,0.15) 0%, rgba(14,13,11,0.55) 65%, var(--ink) 100%),
+    linear-gradient(90deg, rgba(var(--civ-glow),0.28), transparent 55%);
+}
+.civ-hero-text{
+  position: absolute; left: var(--gutter); bottom: clamp(2rem, 6vh, 4rem); z-index: 2;
+  display: flex; align-items: baseline; gap: 1.2rem;
+}
+.civ-number{
+  font-family: "Space Mono", monospace; font-size: clamp(1.4rem, 1rem + 1.6vw, 2.4rem);
+  color: var(--civ-a); border: 1px solid var(--civ-a); padding: 0.3em 0.6em; line-height: 1;
+}
+.civ-hero-text h2{ font-size: var(--fs-h2); line-height: 0.98; margin: 0; }
+.civ-tagline{
+  position: absolute; left: var(--gutter); bottom: clamp(1rem, 3vh, 1.6rem);
+  font-family: "Space Mono", monospace; font-size: var(--fs-eyebrow);
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+}
+
+.civ-body{ max-width: 78rem; margin: 0 auto; padding: clamp(3rem, 8vh, 6rem) var(--gutter) clamp(4rem, 9vh, 7rem); }
+
+.civ-meta{
+  display: flex; flex-wrap: wrap; gap: clamp(1.5rem, 4vw, 4rem);
+  padding-bottom: clamp(2.5rem, 6vh, 4rem); margin-bottom: clamp(2.5rem, 6vh, 4rem);
+  border-bottom: 1px solid var(--line);
+}
+.meta-block{ display: flex; flex-direction: column; gap: 0.4rem; }
+.meta-label{
+  font-family: "Space Mono", monospace; font-size: var(--fs-eyebrow);
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--civ-a);
+}
+.meta-value{ font-size: 1.05rem; color: var(--parchment); max-width: 22rem; }
+
+.civ-grid{
+  display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center; margin-bottom: clamp(3.5rem, 9vh, 6rem);
+}
+.civ-grid.reverse{ direction: rtl; }
+.civ-grid.reverse > *{ direction: ltr; }
+.civ-text h3{ font-size: var(--fs-h3); color: var(--parchment); }
+.civ-text h3::before{
+  content: ""; display: block; width: 2.4rem; height: 2px; background: var(--civ-a); margin-bottom: 0.9rem;
+}
+.civ-text p{ color: var(--parchment); opacity: 0.92; }
+
+.civ-image{ margin: 0; position: relative; }
+.civ-image img{
+  width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: var(--radius);
+  box-shadow: 0 25px 60px -20px rgba(0,0,0,0.6);
+}
+.civ-image figcaption{
+  font-family: "Space Mono", monospace; font-size: 0.72rem; letter-spacing: 0.02em;
+  color: var(--muted); padding-top: 0.75rem; line-height: 1.5;
+  border-top: 1px dotted var(--line); margin-top: 0.75rem;
+}
+
+.fact-strip{
+  list-style: none; margin: 0; padding: clamp(2rem, 5vh, 3rem) 0 0; display: grid;
+  grid-template-columns: repeat(4, 1fr); gap: 1.5rem 2rem;
+  border-top: 1px solid var(--line);
+}
+.fact-strip li{ display: flex; flex-direction: column; gap: 0.3rem; }
+.fact-num{ font-family: "Cormorant Garamond", serif; font-size: var(--fs-fact); font-weight: 600; color: var(--civ-a); line-height: 1; }
+.fact-label{ font-family: "Space Mono", monospace; font-size: 0.72rem; letter-spacing: 0.03em; color: var(--muted); line-height: 1.5; }
+
+/* ---------- 7. Compare table ---------- */
+.compare{ background: var(--ink-panel); padding: clamp(4rem, 10vh, 7rem) 0; border-top: 1px solid var(--line); }
+.compare-inner{ max-width: 68rem; margin: 0 auto; padding: 0 var(--gutter); }
+.compare h2{ font-size: var(--fs-h2); margin-bottom: 1.1rem; }
+.compare-lede{ font-size: var(--fs-lede); max-width: 46rem; color: var(--parchment); opacity: 0.9; margin-bottom: 3rem; }
+
+.compare-table-wrap{ overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+.compare-table{ width: 100%; border-collapse: collapse; min-width: 640px; }
+.compare-table th, .compare-table td{
+  padding: 1.1rem 1.4rem; text-align: left; border-bottom: 1px solid var(--line);
+  font-size: 0.98rem; vertical-align: top;
+}
+.compare-table thead th{
+  font-family: "Space Mono", monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); background: var(--ink-raise);
+}
+.compare-table th.c-egypt{ color: #c9a227; }
+.compare-table th.c-meso{ color: #d38257; }
+.compare-table th.c-china{ color: #d1585f; }
+.compare-table tbody tr:last-child td{ border-bottom: none; }
+.compare-table tbody td:first-child{
+  font-family: "Space Mono", monospace; font-size: 0.78rem; letter-spacing: 0.03em; color: var(--muted);
+}
+.compare-table tbody tr:hover{ background: rgba(236,228,211,0.03); }
+
+/* ---------- 8. Footer ---------- */
+.site-footer{
+  padding: clamp(2rem, 5vh, 3rem) var(--gutter); text-align: center;
+  color: var(--muted); font-size: 0.85rem; background: var(--ink);
+  border-top: 1px solid var(--line);
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+}
+.back-to-top{
+  font-family: "Space Mono", monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  background: none; border: 1px solid var(--line); color: var(--parchment);
+  padding: 0.6rem 1.1rem; cursor: pointer; border-radius: var(--radius);
+  transition: border-color .3s ease, color .3s ease;
+}
+.back-to-top:hover{ border-color: var(--gold); color: var(--gold); }
+
+/* focus visibility (accessibility floor) */
+a:focus-visible, button:focus-visible{
+  outline: 2px solid var(--gold); outline-offset: 3px;
+}
+
+/* ---------- 9. Responsive breakpoints ---------- */
+
+/* Tablet & below: stack the two-column grids, hide side wayfinder text less critically */
+@media (max-width: 900px){
+  .civ-grid, .civ-grid.reverse{
+    grid-template-columns: 1fr; direction: ltr;
+  }
+  .civ-grid .civ-image{ order: -1; }
+  .fact-strip{ grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Phones: top bar nav replaces side wayfinder, tighter paddings */
+@media (max-width: 720px){
+  .wayfinder{ display: none; }
+  .topbar{ display: flex; }
+  .mobile-menu{ display: flex; }
+  .civ-hero{ height: 62svh; }
+  .civ-body{ padding-top: clamp(2.5rem, 6vh, 3.5rem); }
+  .hero-content{ padding-bottom: 5rem; }
+  .fact-strip{ grid-template-columns: 1fr 1fr; }
+  .spine{ display: none; }
+}
+
+@media (max-width: 420px){
+  .fact-strip{ grid-template-columns: 1fr; }
+}
+
+/* Large desktop / smartboard / TV: cap line length, boost breathing room */
+@media (min-width: 1600px){
+  :root{ --gutter: 5vw; }
+  .civ-body, .compare-inner{ max-width: 88rem; }
+  .civ-text p, .hero-sub, .compare-lede{ font-size: 1.2em; }
+}
+@media (min-width: 2200px){
+  html{ font-size: 20px; } /* comfortable reading distance on TVs / smartboards */
+  .civ-body, .compare-inner{ max-width: 108rem; }
+}
+
+/* Landscape tablets / smartboards presenting sideways: keep hero from feeling too tall */
+@media (orientation: landscape) and (max-height: 620px){
+  .hero{ min-height: 100vh; align-items: center; }
+  .civ-hero{ height: 90vh; }
+}
+
+/* print (just in case a teacher prints notes) */
+@media print{
+  .wayfinder, .spine, .topbar, .mobile-menu, .hero-scroll-cue, .back-to-top{ display: none !important; }
+  body{ background: #fff; color: #111; }
+}
