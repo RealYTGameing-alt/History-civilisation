@@ -5,7 +5,7 @@
    - Mobile menu toggle
    - Back-to-top button
    All scroll work is throttled with requestAnimationFrame so it never
-   fights the browser's paint cycle -> no jank on low-power classroom PCs.
+   fights the browser paint cycle -> no jank on low-power classroom PCs.
    ========================================================================== */
 (function () {
   "use strict";
