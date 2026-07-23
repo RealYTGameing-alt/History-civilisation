@@ -235,18 +235,22 @@ strong { color: var(--parchment); font-weight: 600; }
     linear-gradient(90deg, rgba(var(--civ-glow),0.28), transparent 55%);
 }
 .civ-hero-text{
-  position: absolute; left: var(--gutter); bottom: clamp(2rem, 6vh, 4rem); z-index: 2;
+  position: absolute; left: var(--gutter); right: var(--gutter); bottom: clamp(2rem, 6vh, 4rem); z-index: 2;
+  display: flex; flex-direction: column; gap: 0.7rem;
+}
+.civ-hero-heading{
   display: flex; align-items: baseline; gap: 1.2rem;
 }
 .civ-number{
   font-family: "Space Mono", monospace; font-size: clamp(1.4rem, 1rem + 1.6vw, 2.4rem);
   color: var(--civ-a); border: 1px solid var(--civ-a); padding: 0.3em 0.6em; line-height: 1;
+  flex-shrink: 0;
 }
 .civ-hero-text h2{ font-size: var(--fs-h2); line-height: 0.98; margin: 0; }
 .civ-tagline{
-  position: absolute; left: var(--gutter); bottom: clamp(1rem, 3vh, 1.6rem);
   font-family: "Space Mono", monospace; font-size: var(--fs-eyebrow);
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+  margin: 0;
 }
 
 .civ-body{ max-width: 78rem; margin: 0 auto; padding: clamp(3rem, 8vh, 6rem) var(--gutter) clamp(4rem, 9vh, 7rem); }
