@@ -1,8 +1,9 @@
 /* ==========================================================================
    CRADLES OF CIVILIZATION — stylesheet
    Structure: 1. Reset & tokens  2. Base type  3. Fade-in animation system
-   4. Wayfinder / spine nav  5. Hero  6. Civilization sections
-   7. Compare table  8. Footer  9. Responsive breakpoints
+   4. Wayfinder / spine nav  5. Control panel  6. Hero  7. Civilization sections
+   8. Lightbox  9. Compare table  10. Quiz  11. Footer
+   12. Touch / smartboard mode  13. High contrast  14. Responsive breakpoints
    ========================================================================== */
 
 /* ---------- 1. Reset & design tokens ---------- */
@@ -24,18 +25,27 @@ html {
   --parchment:  #ece4d3;
   --muted:      #a89a80;
   --gold:       #c9a227;
+  --good:       #4f9d73;
+  --bad:        #c1553f;
 
-  /* type scale — fluid via clamp() so it holds up on phones through TVs */
-  --fs-eyebrow: clamp(0.7rem, 0.55rem + 0.4vw, 0.85rem);
-  --fs-body:    clamp(1rem, 0.93rem + 0.25vw, 1.15rem);
-  --fs-lede:    clamp(1.15rem, 1.02rem + 0.5vw, 1.45rem);
-  --fs-h2:      clamp(2.2rem, 1.6rem + 2.6vw, 4.4rem);
-  --fs-h3:      clamp(1.4rem, 1.2rem + 1vw, 2rem);
-  --fs-hero:    clamp(2.6rem, 1.6rem + 5vw, 6.5rem);
-  --fs-fact:    clamp(1.9rem, 1.4rem + 2vw, 3.2rem);
+  /* type scale — fluid via clamp(), and scaled further by --text-scale (control panel) */
+  --text-scale: 1;
+  --fs-eyebrow: calc(clamp(0.7rem, 0.55rem + 0.4vw, 0.85rem) * var(--text-scale));
+  --fs-body:    calc(clamp(1rem, 0.93rem + 0.25vw, 1.15rem) * var(--text-scale));
+  --fs-lede:    calc(clamp(1.15rem, 1.02rem + 0.5vw, 1.45rem) * var(--text-scale));
+  --fs-h2:      calc(clamp(2.2rem, 1.6rem + 2.6vw, 4.4rem) * var(--text-scale));
+  --fs-h3:      calc(clamp(1.4rem, 1.2rem + 1vw, 2rem) * var(--text-scale));
+  --fs-hero:    calc(clamp(2.6rem, 1.6rem + 5vw, 6.5rem) * var(--text-scale));
+  --fs-fact:    calc(clamp(1.9rem, 1.4rem + 2vw, 3.2rem) * var(--text-scale));
 
   --gutter: clamp(1.25rem, 4vw, 4rem);
   --radius: 2px;
+  --tap-min: 44px;
+}
+
+/* Smartboards / large touch panels: bump the minimum comfortable tap size */
+@media (pointer: coarse){
+  :root{ --tap-min: 60px; }
 }
 
 html, body { height: 100%; }
@@ -77,11 +87,14 @@ strong { color: var(--parchment); font-weight: 600; }
 /* ---------- 3. Fade-in animation system ---------- */
 .fade-up{
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.9s cubic-bezier(.22,.61,.36,1), transform 0.9s cubic-bezier(.22,.61,.36,1);
-  will-change: opacity, transform;
+  transform: translateY(28px) scale(0.985);
+  filter: blur(4px);
+  transition: opacity 0.9s cubic-bezier(.22,.61,.36,1),
+              transform 0.9s cubic-bezier(.22,.61,.36,1),
+              filter 0.9s cubic-bezier(.22,.61,.36,1);
+  will-change: opacity, transform, filter;
 }
-.fade-up.is-visible{ opacity: 1; transform: translateY(0); }
+.fade-up.is-visible{ opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 
 /* stagger children of fact-strip and civ-meta slightly */
 .civ-meta.is-visible .meta-block,
@@ -95,18 +108,42 @@ strong { color: var(--parchment); font-weight: 600; }
 .civ-meta .meta-block:nth-child(3), .fact-strip li:nth-child(3){ transition-delay: .25s; }
 .fact-strip li:nth-child(4){ transition-delay: .35s; }
 
+.fact-num{ font-variant-numeric: tabular-nums; }
+
 @media (prefers-reduced-motion: reduce){
   .fade-up, .civ-meta .meta-block, .fact-strip li{
-    transition: none !important; opacity: 1 !important; transform: none !important;
+    transition: none !important; opacity: 1 !important; transform: none !important; filter: none !important;
   }
 }
 
 /* ancient-artifact image treatment: warm duotone that lifts to full color on hover/focus */
 .civ-image img, .hero-bg img, .civ-hero img{
   filter: sepia(0.34) saturate(1.18) contrast(1.04) brightness(0.94);
-  transition: filter 0.6s ease, transform 8s linear;
+  transition: filter 0.6s ease, transform 0.6s cubic-bezier(.22,.61,.36,1);
 }
-.civ-image:hover img{ filter: sepia(0.08) saturate(1.08) contrast(1.03) brightness(1); }
+.civ-image:hover img, .civ-image:focus-visible img{
+  filter: sepia(0.08) saturate(1.08) contrast(1.03) brightness(1);
+  transform: scale(1.025);
+}
+.civ-image{
+  cursor: zoom-in;
+  border-radius: var(--radius);
+  outline: none;
+}
+.civ-image:focus-visible{ box-shadow: 0 0 0 3px var(--civ-a); border-radius: var(--radius); }
+.zoom-hint{
+  position: absolute; top: 0.7rem; right: 0.7rem;
+  font-family: "Space Mono", monospace; font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--parchment); background: rgba(14,13,11,0.55); backdrop-filter: blur(3px);
+  padding: 0.4em 0.7em; border-radius: 999px; border: 1px solid rgba(236,228,211,0.2);
+  opacity: 0; transform: translateY(-4px);
+  transition: opacity .3s ease, transform .3s ease;
+  pointer-events: none;
+}
+.civ-image:hover .zoom-hint, .civ-image:focus-visible .zoom-hint{ opacity: 1; transform: translateY(0); }
+@media (pointer: coarse){
+  .zoom-hint{ opacity: 1; transform: translateY(0); } /* always show the hint on touch, no hover to rely on */
+}
 
 /* ---------- 4. Wayfinder + progress spine ---------- */
 .spine{
@@ -118,6 +155,7 @@ strong { color: var(--parchment); font-weight: 600; }
   position:absolute; top:0; left:0; width:100%; height:0%;
   background: linear-gradient(180deg, var(--gold), rgba(201,162,39,0.3));
   transition: height .1s linear;
+  box-shadow: 0 0 12px rgba(201,162,39,0.5);
 }
 
 .wayfinder{
@@ -129,6 +167,11 @@ strong { color: var(--parchment); font-weight: 600; }
   border: 1px solid var(--muted); background: transparent;
   text-decoration: none; transition: background .3s, border-color .3s, transform .3s;
   flex-shrink: 0;
+}
+/* generous invisible hit-area so the dots stay easy to hit without looking huge */
+.way-dot::before{
+  content: ""; position: absolute; inset: 50%; width: var(--tap-min); height: var(--tap-min);
+  transform: translate(-50%, -50%);
 }
 .way-dot span{
   position: absolute; right: 22px; top: 50%; transform: translateY(-50%);
@@ -154,7 +197,10 @@ strong { color: var(--parchment); font-weight: 600; }
   width: 34px; height: 26px; background: none; border: none; cursor: pointer;
   display: flex; flex-direction: column; justify-content: space-between; padding: 4px 0;
 }
-.topbar-toggle span{ display:block; height: 2px; background: var(--parchment); border-radius: 2px; }
+.topbar-toggle span{ display:block; height: 2px; background: var(--parchment); border-radius: 2px; transition: transform .3s ease, opacity .3s ease; }
+.topbar-toggle[aria-expanded="true"] span:nth-child(1){ transform: translateY(11px) rotate(45deg); }
+.topbar-toggle[aria-expanded="true"] span:nth-child(2){ opacity: 0; }
+.topbar-toggle[aria-expanded="true"] span:nth-child(3){ transform: translateY(-11px) rotate(-45deg); }
 .mobile-menu{
   display: none; position: fixed; inset: 0; z-index: 65;
   background: var(--ink-panel);
@@ -165,17 +211,37 @@ strong { color: var(--parchment); font-weight: 600; }
 .mobile-menu.open{ opacity: 1; transform: translateY(0); pointer-events: auto; }
 .mobile-menu a{
   font-family: "Cormorant Garamond", serif; font-size: 1.8rem; text-decoration: none; color: var(--parchment);
+  padding: 0.3em 0.6em;
 }
 
-/* ---------- 5. Hero ---------- */
+/* ---------- 5. Control panel (font scale / contrast / fullscreen) ---------- */
+.control-panel{
+  position: fixed; left: clamp(0.75rem, 2vw, 1.5rem); bottom: clamp(0.75rem, 2vw, 1.5rem);
+  z-index: 55; display: flex; gap: 0.5rem;
+  background: rgba(23,20,16,0.82); backdrop-filter: blur(8px);
+  border: 1px solid var(--line); border-radius: 999px; padding: 0.4rem;
+}
+.ctrl-btn{
+  min-width: var(--tap-min); min-height: var(--tap-min);
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; border-radius: 999px;
+  color: var(--parchment); font-family: "Space Mono", monospace; font-size: 0.9rem;
+  cursor: pointer; transition: background .25s ease, color .25s ease, transform .2s ease;
+}
+.ctrl-btn:hover{ background: rgba(236,228,211,0.08); }
+.ctrl-btn:active{ transform: scale(0.9); }
+.ctrl-btn[aria-pressed="true"]{ background: var(--gold); color: var(--ink); }
+
+/* ---------- 6. Hero ---------- */
 .hero{
   position: relative; min-height: 100svh; display: flex; align-items: flex-end;
   overflow: hidden;
 }
 .hero-bg{ position: absolute; inset: 0; }
 .hero-bg img{
-  width: 100%; height: 100%; object-fit: cover; object-position: center 62%;
-  transform: scale(1.08);
+  width: 100%; height: 110%; object-fit: cover; object-position: center 62%;
+  transform: scale(1.08) translateY(var(--parallax-y, 0));
+  transition: transform .1s linear;
 }
 .hero-scrim{
   position: absolute; inset: 0;
@@ -183,6 +249,37 @@ strong { color: var(--parchment); font-weight: 600; }
     linear-gradient(180deg, rgba(14,13,11,0.55) 0%, rgba(14,13,11,0.35) 40%, rgba(14,13,11,0.92) 96%),
     linear-gradient(90deg, rgba(14,13,11,0.55), rgba(14,13,11,0.15) 45%, rgba(14,13,11,0.55));
 }
+
+/* drifting dust motes — a small nod to sunbeams through a museum skylight */
+.hero-motes{ position: absolute; inset: 0; overflow: hidden; z-index: 1; }
+.hero-motes span{
+  position: absolute; bottom: -5%; width: 3px; height: 3px; border-radius: 50%;
+  background: rgba(236,228,211,0.55); box-shadow: 0 0 6px 1px rgba(201,162,39,0.4);
+  animation: moteRise linear infinite;
+}
+.hero-motes span:nth-child(1){ left: 8%;  width: 4px; height: 4px; animation-duration: 18s; animation-delay: -2s; }
+.hero-motes span:nth-child(2){ left: 22%; animation-duration: 24s; animation-delay: -9s; }
+.hero-motes span:nth-child(3){ left: 41%; width: 2px; height: 2px; animation-duration: 15s; animation-delay: -4s; }
+.hero-motes span:nth-child(4){ left: 63%; animation-duration: 26s; animation-delay: -14s; }
+.hero-motes span:nth-child(5){ left: 78%; width: 5px; height: 5px; animation-duration: 21s; animation-delay: -6s; }
+.hero-motes span:nth-child(6){ left: 91%; animation-duration: 19s; animation-delay: -11s; }
+@keyframes moteRise{
+  0%   { transform: translateY(0) translateX(0);      opacity: 0; }
+  10%  { opacity: 0.8; }
+  90%  { opacity: 0.5; }
+  100% { transform: translateY(-115vh) translateX(30px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce){ .hero-motes{ display: none; } }
+
+/* cursor-follow warm spotlight — desktop pointer only, set via JS custom properties */
+.hero-spotlight{
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(480px circle at var(--mx, 50%) var(--my, 40%), rgba(201,162,39,0.16), transparent 65%);
+  opacity: 0; transition: opacity .4s ease;
+}
+.hero:hover .hero-spotlight{ opacity: 1; }
+@media (pointer: coarse){ .hero-spotlight{ display: none; } }
+
 .hero-content{
   position: relative; z-index: 2;
   padding: 0 var(--gutter) clamp(4rem, 10vh, 7rem);
@@ -192,21 +289,36 @@ strong { color: var(--parchment); font-weight: 600; }
   font-size: var(--fs-hero); line-height: 0.95; margin: 0 0 1.1rem;
   color: var(--parchment);
   text-shadow: 0 2px 40px rgba(0,0,0,0.5);
+  animation: heroRise 1.1s cubic-bezier(.16,.84,.32,1) both;
 }
 .hero-sub{
   font-size: var(--fs-lede); max-width: 42rem; color: var(--parchment); opacity: 0.92;
   margin-bottom: 2.2rem; line-height: 1.55;
+  animation: heroRise 1.1s cubic-bezier(.16,.84,.32,1) both; animation-delay: .15s;
 }
+@keyframes heroRise{
+  from{ opacity: 0; transform: translateY(22px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce){ .hero-title, .hero-sub{ animation: none; } }
+
+.hero-cta-row{ display: flex; flex-wrap: wrap; gap: 1rem; animation: heroRise 1.1s cubic-bezier(.16,.84,.32,1) both; animation-delay: .3s; }
+@media (prefers-reduced-motion: reduce){ .hero-cta-row{ animation: none; } }
 .hero-cta{
   display: inline-flex; align-items: center; gap: 0.6rem;
   font-family: "Space Mono", monospace; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--ink); background: var(--gold); text-decoration: none;
   padding: 0.95rem 1.6rem; border-radius: var(--radius);
+  min-height: var(--tap-min);
   transition: transform .3s ease, box-shadow .3s ease;
 }
 .hero-cta:hover{ transform: translateY(-2px); box-shadow: 0 10px 30px rgba(201,162,39,0.35); }
 .hero-cta svg{ transition: transform .3s ease; }
 .hero-cta:hover svg{ transform: translateY(2px); }
+.hero-cta-ghost{
+  background: transparent; color: var(--parchment); border: 1px solid rgba(236,228,211,0.35);
+}
+.hero-cta-ghost:hover{ box-shadow: none; border-color: var(--gold); color: var(--gold); }
 
 .hero-scroll-cue{
   position: absolute; bottom: 1.6rem; left: var(--gutter); z-index: 2;
@@ -223,11 +335,11 @@ strong { color: var(--parchment); font-weight: 600; }
 @keyframes cueDrop{ 0%{ top: -100%; } 60%{ top: 100%; } 100%{ top: 100%; } }
 @media (prefers-reduced-motion: reduce){ .cue-line::after{ animation: none; top: 30%; } }
 
-/* ---------- 6. Civilization sections ---------- */
+/* ---------- 7. Civilization sections ---------- */
 .civ{ position: relative; background: var(--ink); }
 
 .civ-hero{ position: relative; height: 78svh; min-height: 420px; overflow: hidden; }
-.civ-hero img{ width: 100%; height: 100%; object-fit: cover; }
+.civ-hero img{ width: 100%; height: 112%; object-fit: cover; transform: translateY(var(--parallax-y, 0)); transition: transform .1s linear; }
 .civ-hero-scrim{
   position: absolute; inset: 0;
   background:
@@ -299,7 +411,35 @@ strong { color: var(--parchment); font-weight: 600; }
 .fact-num{ font-family: "Cormorant Garamond", serif; font-size: var(--fs-fact); font-weight: 600; color: var(--civ-a); line-height: 1; }
 .fact-label{ font-family: "Space Mono", monospace; font-size: 0.72rem; letter-spacing: 0.03em; color: var(--muted); line-height: 1.5; }
 
-/* ---------- 7. Compare table ---------- */
+/* ---------- 8. Lightbox ---------- */
+.lightbox{
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(9,8,6,0.94); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; padding: clamp(1.5rem, 5vw, 4rem);
+  opacity: 0; visibility: hidden; transform: scale(1.02);
+  transition: opacity .35s ease, transform .35s ease, visibility 0s linear .35s;
+}
+.lightbox.open{ opacity: 1; visibility: visible; transform: scale(1); transition: opacity .35s ease, transform .35s ease; }
+.lightbox-figure{ margin: 0; max-width: 68rem; width: 100%; }
+.lightbox-figure img{
+  width: 100%; max-height: 78vh; object-fit: contain; border-radius: var(--radius);
+  box-shadow: 0 40px 100px -20px rgba(0,0,0,0.7);
+}
+.lightbox-figure figcaption{
+  font-family: "Space Mono", monospace; font-size: 0.8rem; color: var(--muted);
+  margin-top: 1rem; text-align: center;
+}
+.lightbox-close{
+  position: absolute; top: clamp(0.75rem, 3vw, 2rem); right: clamp(0.75rem, 3vw, 2rem);
+  min-width: var(--tap-min); min-height: var(--tap-min);
+  background: rgba(236,228,211,0.08); border: 1px solid var(--line); color: var(--parchment);
+  border-radius: 50%; font-size: 1.1rem; cursor: pointer;
+  transition: background .25s ease, transform .2s ease;
+}
+.lightbox-close:hover{ background: rgba(236,228,211,0.18); }
+.lightbox-close:active{ transform: scale(0.9); }
+
+/* ---------- 9. Compare table ---------- */
 .compare{ background: var(--ink-panel); padding: clamp(4rem, 10vh, 7rem) 0; border-top: 1px solid var(--line); }
 .compare-inner{ max-width: 68rem; margin: 0 auto; padding: 0 var(--gutter); }
 .compare h2{ font-size: var(--fs-h2); margin-bottom: 1.1rem; }
@@ -324,7 +464,137 @@ strong { color: var(--parchment); font-weight: 600; }
 }
 .compare-table tbody tr:hover{ background: rgba(236,228,211,0.03); }
 
-/* ---------- 8. Footer ---------- */
+/* ---------- 10. Quiz ---------- */
+.quiz-section{ background: var(--ink); padding: clamp(4rem, 10vh, 7rem) 0; border-top: 1px solid var(--line); }
+.quiz-inner{ max-width: 52rem; margin: 0 auto; padding: 0 var(--gutter); }
+.quiz-section h2{ font-size: var(--fs-h2); margin-bottom: 1.1rem; }
+.quiz-lede{ font-size: var(--fs-lede); color: var(--parchment); opacity: 0.9; margin-bottom: 3rem; max-width: 40rem; }
+
+.quiz-card{
+  background: var(--ink-panel); border: 1px solid var(--line); border-radius: 6px;
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+}
+
+.quiz-progress{ display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+.quiz-progress-track{ flex: 1; height: 4px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.quiz-progress-fill{ height: 100%; background: var(--gold); border-radius: 999px; transition: width .5s cubic-bezier(.22,.61,.36,1); }
+.quiz-progress-label{ font-family: "Space Mono", monospace; font-size: 0.72rem; letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; }
+
+.quiz-tag{
+  display: inline-block; font-family: "Space Mono", monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.3em 0.7em; border-radius: 999px; border: 1px solid currentColor; margin-bottom: 1.1rem;
+}
+.quiz-question{ font-family: "Cormorant Garamond", serif; font-size: var(--fs-h3); line-height: 1.25; margin-bottom: 1.6rem; color: var(--parchment); }
+
+.quiz-options{ display: grid; gap: 0.75rem; list-style: none; margin: 0 0 1.5rem; padding: 0; }
+.quiz-option{
+  display: flex; align-items: center; gap: 0.9rem;
+  width: 100%; text-align: left; min-height: var(--tap-min);
+  padding: 0.95rem 1.2rem; border-radius: 4px;
+  background: var(--ink-raise); border: 1px solid var(--line); color: var(--parchment);
+  font-family: "Source Serif 4", Georgia, serif; font-size: 1rem;
+  cursor: pointer; transition: border-color .2s ease, background .2s ease, transform .15s ease;
+}
+.quiz-option:hover:not(:disabled){ border-color: var(--gold); transform: translateX(2px); }
+.quiz-option:active:not(:disabled){ transform: scale(0.99); }
+.quiz-option:focus-visible{ outline: 2px solid var(--gold); outline-offset: 2px; }
+.quiz-option .opt-letter{
+  flex-shrink: 0; width: 1.9rem; height: 1.9rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Space Mono", monospace; font-size: 0.78rem; border: 1px solid var(--muted); color: var(--muted);
+  transition: border-color .2s ease, color .2s ease, background .2s ease;
+}
+.quiz-option:disabled{ cursor: default; }
+.quiz-option.correct{ border-color: var(--good); background: rgba(79,157,115,0.12); }
+.quiz-option.correct .opt-letter{ border-color: var(--good); color: var(--good); background: rgba(79,157,115,0.15); }
+.quiz-option.incorrect{ border-color: var(--bad); background: rgba(193,85,63,0.12); }
+.quiz-option.incorrect .opt-letter{ border-color: var(--bad); color: var(--bad); background: rgba(193,85,63,0.15); }
+.quiz-option.reveal-correct:not(.incorrect){ border-color: var(--good); }
+.quiz-option.reveal-correct:not(.incorrect) .opt-letter{ border-color: var(--good); color: var(--good); }
+.quiz-option.dim{ opacity: 0.45; }
+
+.quiz-feedback{
+  display: flex; gap: 0.9rem; align-items: flex-start;
+  padding: 1rem 1.2rem; border-radius: 4px; margin-bottom: 1.5rem;
+  border: 1px solid var(--line); background: var(--ink-raise);
+  animation: feedbackIn .4s cubic-bezier(.22,.61,.36,1) both;
+}
+@keyframes feedbackIn{ from{ opacity: 0; transform: translateY(-6px); } to{ opacity: 1; transform: translateY(0); } }
+.quiz-feedback.correct{ border-color: rgba(79,157,115,0.4); }
+.quiz-feedback.incorrect{ border-color: rgba(193,85,63,0.4); }
+.quiz-feedback-icon{ font-size: 1.1rem; line-height: 1; }
+.quiz-feedback.correct .quiz-feedback-icon{ color: var(--good); }
+.quiz-feedback.incorrect .quiz-feedback-icon{ color: var(--bad); }
+.quiz-feedback-text{ font-size: 0.95rem; opacity: 0.92; }
+.quiz-feedback-text strong{ display: block; font-family: "Space Mono", monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.3rem; }
+.quiz-feedback.correct .quiz-feedback-text strong{ color: var(--good); }
+.quiz-feedback.incorrect .quiz-feedback-text strong{ color: var(--bad); }
+
+.quiz-nav{ display: flex; justify-content: flex-end; }
+.quiz-next{
+  min-height: var(--tap-min);
+  font-family: "Space Mono", monospace; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink); background: var(--gold); border: none; cursor: pointer;
+  padding: 0.9rem 1.7rem; border-radius: var(--radius); display: inline-flex; align-items: center; gap: 0.6rem;
+  opacity: 0; transform: translateY(6px); pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease, box-shadow .3s ease;
+}
+.quiz-next.show{ opacity: 1; transform: translateY(0); pointer-events: auto; }
+.quiz-next:hover{ box-shadow: 0 10px 30px rgba(201,162,39,0.35); }
+
+/* start screen */
+.quiz-start{ text-align: center; padding: 1.5rem 0; }
+.quiz-start-btn{
+  min-height: var(--tap-min);
+  margin-top: 1.5rem;
+  font-family: "Space Mono", monospace; font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink); background: var(--gold); border: none; cursor: pointer;
+  padding: 1rem 2.2rem; border-radius: var(--radius);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.quiz-start-btn:hover{ transform: translateY(-2px); box-shadow: 0 10px 30px rgba(201,162,39,0.35); }
+
+/* results screen */
+.quiz-results{ text-align: center; padding: 1rem 0; }
+.quiz-score-ring{
+  width: 148px; height: 148px; border-radius: 50%; margin: 0 auto 1.5rem;
+  display: flex; align-items: center; justify-content: center;
+  background: conic-gradient(var(--gold) calc(var(--pct, 0) * 1%), var(--line) 0);
+  animation: ringIn 1s cubic-bezier(.22,.61,.36,1) both;
+}
+@keyframes ringIn{ from{ transform: scale(0.7); opacity: 0; } to{ transform: scale(1); opacity: 1; } }
+.quiz-score-ring-inner{
+  width: 118px; height: 118px; border-radius: 50%; background: var(--ink-panel);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.quiz-score-num{ font-family: "Cormorant Garamond", serif; font-size: 2.4rem; font-weight: 600; color: var(--parchment); line-height: 1; }
+.quiz-score-den{ font-family: "Space Mono", monospace; font-size: 0.7rem; color: var(--muted); }
+.quiz-verdict{ font-size: var(--fs-h3); font-family: "Cormorant Garamond", serif; margin-bottom: 0.6rem; }
+.quiz-verdict-sub{ color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; max-width: 32rem; margin-left: auto; margin-right: auto; }
+.quiz-retry-row{ display: flex; gap: 0.9rem; justify-content: center; flex-wrap: wrap; }
+.quiz-retry-btn{
+  min-height: var(--tap-min);
+  font-family: "Space Mono", monospace; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase;
+  background: transparent; color: var(--parchment); border: 1px solid var(--line); cursor: pointer;
+  padding: 0.85rem 1.5rem; border-radius: var(--radius); transition: border-color .25s ease, color .25s ease;
+}
+.quiz-retry-btn:hover{ border-color: var(--gold); color: var(--gold); }
+.quiz-retry-btn.primary{ background: var(--gold); color: var(--ink); border-color: var(--gold); }
+.quiz-retry-btn.primary:hover{ opacity: 0.9; color: var(--ink); }
+
+/* confetti burst on a strong finish */
+.quiz-confetti{ position: relative; height: 0; }
+.quiz-confetti span{
+  position: absolute; top: 0; left: 50%; width: 6px; height: 10px;
+  animation: confettiFall 1.6s ease-out forwards;
+}
+@keyframes confettiFall{
+  0%{ transform: translate(0,0) rotate(0deg); opacity: 1; }
+  100%{ transform: translate(var(--dx), 160px) rotate(var(--rot)); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce){ .quiz-confetti{ display: none; } }
+
+/* ---------- 11. Footer ---------- */
 .site-footer{
   padding: clamp(2rem, 5vh, 3rem) var(--gutter); text-align: center;
   color: var(--muted); font-size: 0.85rem; background: var(--ink);
@@ -332,21 +602,55 @@ strong { color: var(--parchment); font-weight: 600; }
   display: flex; flex-direction: column; align-items: center; gap: 1rem;
 }
 .back-to-top{
+  min-height: var(--tap-min); min-width: var(--tap-min);
   font-family: "Space Mono", monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
   background: none; border: 1px solid var(--line); color: var(--parchment);
   padding: 0.6rem 1.1rem; cursor: pointer; border-radius: var(--radius);
-  transition: border-color .3s ease, color .3s ease;
+  transition: border-color .3s ease, color .3s ease, transform .2s ease;
 }
 .back-to-top:hover{ border-color: var(--gold); color: var(--gold); }
+.back-to-top:active{ transform: scale(0.95); }
 
 /* focus visibility (accessibility floor) */
 a:focus-visible, button:focus-visible{
   outline: 2px solid var(--gold); outline-offset: 3px;
 }
 
-/* ---------- 9. Responsive breakpoints ---------- */
+/* ---------- 12. Touch / smartboard mode ---------- */
+/* Applied via JS as a class on <html> when a coarse pointer is detected, so
+   large-format touch panels get always-visible labels and bigger click zones
+   even where a mouse-only :hover rule would otherwise hide them. */
+.touch-mode .way-dot{ width: 12px; height: 12px; }
+.touch-mode .way-dot span{ opacity: 0.65; }
+.touch-mode .way-dot.active span{ opacity: 1; }
+.touch-mode .hero-cta,
+.touch-mode .ctrl-btn,
+.touch-mode .quiz-option,
+.touch-mode .quiz-next,
+.touch-mode .back-to-top{ min-height: calc(var(--tap-min) + 4px); }
+.touch-mode .civ-image:active img{ transform: scale(1.02); }
 
-/* Tablet & below: stack the two-column grids, hide side wayfinder text less critically */
+/* ---------- 13. High-contrast mode (control panel toggle) ---------- */
+.contrast-mode{
+  --ink: #000000;
+  --ink-panel: #0a0a0a;
+  --ink-raise: #141414;
+  --line: rgba(255,255,255,0.28);
+  --parchment: #ffffff;
+  --muted: #d8d2c4;
+  --gold: #ffcf40;
+  --good: #6fe3a3;
+  --bad: #ff8a70;
+}
+.contrast-mode .civ-image img,
+.contrast-mode .hero-bg img,
+.contrast-mode .civ-hero img{ filter: none; }
+.contrast-mode .hero-scrim,
+.contrast-mode .civ-hero-scrim{ background: rgba(0,0,0,0.72); }
+
+/* ---------- 14. Responsive breakpoints ---------- */
+
+/* Tablet & below: stack the two-column grids */
 @media (max-width: 900px){
   .civ-grid, .civ-grid.reverse{
     grid-template-columns: 1fr; direction: ltr;
@@ -365,21 +669,25 @@ a:focus-visible, button:focus-visible{
   .hero-content{ padding-bottom: 5rem; }
   .fact-strip{ grid-template-columns: 1fr 1fr; }
   .spine{ display: none; }
+  .control-panel{ bottom: auto; top: 4.2rem; left: 50%; transform: translateX(-50%); }
 }
 
 @media (max-width: 420px){
   .fact-strip{ grid-template-columns: 1fr; }
 }
 
-/* Large desktop / smartboard / TV: cap line length, boost breathing room */
+/* Large desktop / smartboard / TV: cap line length, boost breathing room and
+   click targets for viewers standing further from the screen */
 @media (min-width: 1600px){
   :root{ --gutter: 5vw; }
-  .civ-body, .compare-inner{ max-width: 88rem; }
-  .civ-text p, .hero-sub, .compare-lede{ font-size: 1.2em; }
+  .civ-body, .compare-inner, .quiz-inner{ max-width: 88rem; }
+  .civ-text p, .hero-sub, .compare-lede, .quiz-lede{ font-size: 1.2em; }
+  .quiz-card{ max-width: 62rem; margin: 0 auto; }
 }
 @media (min-width: 2200px){
   html{ font-size: 20px; } /* comfortable reading distance on TVs / smartboards */
   .civ-body, .compare-inner{ max-width: 108rem; }
+  .quiz-card{ max-width: 70rem; }
 }
 
 /* Landscape tablets / smartboards presenting sideways: keep hero from feeling too tall */
@@ -390,6 +698,6 @@ a:focus-visible, button:focus-visible{
 
 /* print (just in case a teacher prints notes) */
 @media print{
-  .wayfinder, .spine, .topbar, .mobile-menu, .hero-scroll-cue, .back-to-top{ display: none !important; }
+  .wayfinder, .spine, .topbar, .mobile-menu, .hero-scroll-cue, .back-to-top, .control-panel, .lightbox{ display: none !important; }
   body{ background: #fff; color: #111; }
 }
